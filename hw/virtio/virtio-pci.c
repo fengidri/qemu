@@ -1232,16 +1232,16 @@ static uint64_t virtio_pci_common_read(void *opaque, hwaddr addr,
     case VIRTIO_PCI_COMMON_Q_DESCHI:
         val = proxy->vqs[vdev->queue_sel].desc[1];
         break;
-    case VIRTIO_PCI_COMMON_Q_AVAILLO:
+    case VIRTIO_PCI_COMMON_Q_DRIVERLO:
         val = proxy->vqs[vdev->queue_sel].avail[0];
         break;
-    case VIRTIO_PCI_COMMON_Q_AVAILHI:
+    case VIRTIO_PCI_COMMON_Q_DRIVERHI:
         val = proxy->vqs[vdev->queue_sel].avail[1];
         break;
-    case VIRTIO_PCI_COMMON_Q_USEDLO:
+    case VIRTIO_PCI_COMMON_Q_DEVICELO:
         val = proxy->vqs[vdev->queue_sel].used[0];
         break;
-    case VIRTIO_PCI_COMMON_Q_USEDHI:
+    case VIRTIO_PCI_COMMON_Q_DEVICEHI:
         val = proxy->vqs[vdev->queue_sel].used[1];
         break;
     default:
@@ -1341,16 +1341,16 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
     case VIRTIO_PCI_COMMON_Q_DESCHI:
         proxy->vqs[vdev->queue_sel].desc[1] = val;
         break;
-    case VIRTIO_PCI_COMMON_Q_AVAILLO:
+    case VIRTIO_PCI_COMMON_Q_DRIVERLO:
         proxy->vqs[vdev->queue_sel].avail[0] = val;
         break;
-    case VIRTIO_PCI_COMMON_Q_AVAILHI:
+    case VIRTIO_PCI_COMMON_Q_DRIVERHI:
         proxy->vqs[vdev->queue_sel].avail[1] = val;
         break;
-    case VIRTIO_PCI_COMMON_Q_USEDLO:
+    case VIRTIO_PCI_COMMON_Q_DEVICELO:
         proxy->vqs[vdev->queue_sel].used[0] = val;
         break;
-    case VIRTIO_PCI_COMMON_Q_USEDHI:
+    case VIRTIO_PCI_COMMON_Q_DEVICEHI:
         proxy->vqs[vdev->queue_sel].used[1] = val;
         break;
     default:

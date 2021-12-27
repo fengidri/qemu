@@ -160,10 +160,10 @@ struct virtio_pci_common_cfg {
 	uint16_t queue_notify_off;	/* read-only */
 	uint32_t queue_desc_lo;		/* read-write */
 	uint32_t queue_desc_hi;		/* read-write */
-	uint32_t queue_avail_lo;		/* read-write */
-	uint32_t queue_avail_hi;		/* read-write */
-	uint32_t queue_used_lo;		/* read-write */
-	uint32_t queue_used_hi;		/* read-write */
+	uint32_t queue_driver_lo;	/* read-write */
+	uint32_t queue_driver_hi;	/* read-write */
+	uint32_t queue_device_lo;	/* read-write */
+	uint32_t queue_device_hi;	/* read-write */
 };
 
 /* Fields in VIRTIO_PCI_CAP_PCI_CFG: */
@@ -198,10 +198,10 @@ struct virtio_pci_cfg_cap {
 #define VIRTIO_PCI_COMMON_Q_NOFF	30
 #define VIRTIO_PCI_COMMON_Q_DESCLO	32
 #define VIRTIO_PCI_COMMON_Q_DESCHI	36
-#define VIRTIO_PCI_COMMON_Q_AVAILLO	40
-#define VIRTIO_PCI_COMMON_Q_AVAILHI	44
-#define VIRTIO_PCI_COMMON_Q_USEDLO	48
-#define VIRTIO_PCI_COMMON_Q_USEDHI	52
+#define VIRTIO_PCI_COMMON_Q_DRIVERLO	40
+#define VIRTIO_PCI_COMMON_Q_DRIVERHI	44
+#define VIRTIO_PCI_COMMON_Q_DEVICELO	48
+#define VIRTIO_PCI_COMMON_Q_DEVICEHI	52
 
 #endif /* VIRTIO_PCI_NO_MODERN */
 

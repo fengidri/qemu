@@ -211,17 +211,17 @@ static void set_queue_address(QVirtioDevice *d, QVirtQueue *vq)
                    vq->desc >> 32);
 
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_avail_lo),
+                   offsetof(struct virtio_pci_common_cfg, queue_driver_lo),
                    vq->avail);
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_avail_hi),
+                   offsetof(struct virtio_pci_common_cfg, queue_driver_hi),
                    vq->avail >> 32);
 
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_used_lo),
+                   offsetof(struct virtio_pci_common_cfg, queue_device_lo),
                    vq->used);
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_used_hi),
+                   offsetof(struct virtio_pci_common_cfg, queue_device_hi),
                    vq->used >> 32);
 }
 
