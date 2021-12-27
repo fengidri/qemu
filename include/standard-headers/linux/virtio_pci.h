@@ -164,6 +164,7 @@ struct virtio_pci_common_cfg {
 	uint32_t queue_driver_hi;	/* read-write */
 	uint32_t queue_device_lo;	/* read-write */
 	uint32_t queue_device_hi;	/* read-write */
+	uint16_t queue_notify_data;	/* read-write */
 };
 
 /* Fields in VIRTIO_PCI_CAP_PCI_CFG: */
@@ -202,6 +203,7 @@ struct virtio_pci_cfg_cap {
 #define VIRTIO_PCI_COMMON_Q_DRIVERHI	44
 #define VIRTIO_PCI_COMMON_Q_DEVICELO	48
 #define VIRTIO_PCI_COMMON_Q_DEVICEHI	52
+#define VIRTIO_PCI_COMMON_Q_NOTIFY_DATA	56
 
 #endif /* VIRTIO_PCI_NO_MODERN */
 
