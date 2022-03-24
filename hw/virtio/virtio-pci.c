@@ -339,6 +339,7 @@ static void virtio_ioport_write(void *opaque, uint32_t addr, uint32_t val)
 
         if (vdev->status == 0) {
             virtio_pci_reset(DEVICE(proxy));
+            proxy->vqs[vdev->queue_sel].reset = 0;
         }
 
         /* Linux before 2.6.34 drives the device without enabling
@@ -1244,6 +1245,9 @@ static uint64_t virtio_pci_common_read(void *opaque, hwaddr addr,
     case VIRTIO_PCI_COMMON_Q_DEVICEHI:
         val = proxy->vqs[vdev->queue_sel].used[1];
         break;
+    case VIRTIO_PCI_COMMON_Q_RESET:
+        val = proxy->vqs[vdev->queue_sel].reset;
+        break;
     default:
         val = 0;
     }
@@ -1331,6 +1335,7 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
                        ((uint64_t)proxy->vqs[vdev->queue_sel].used[1]) << 32 |
                        proxy->vqs[vdev->queue_sel].used[0]);
             proxy->vqs[vdev->queue_sel].enabled = 1;
+            proxy->vqs[vdev->queue_sel].reset = 0;
         } else {
             virtio_error(vdev, "wrong value for queue_enable %"PRIx64, val);
         }
@@ -1352,6 +1357,13 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
         break;
     case VIRTIO_PCI_COMMON_Q_DEVICEHI:
         proxy->vqs[vdev->queue_sel].used[1] = val;
+        break;
+    case VIRTIO_PCI_COMMON_Q_RESET:
+        if (val == 1) {
+            proxy->vqs[vdev->queue_sel].enabled = 0;
+            virtio_queue_reset(vdev, vdev->queue_sel);
+            proxy->vqs[vdev->queue_sel].reset = 1;
+        }
         break;
     default:
         break;
