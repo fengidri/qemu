@@ -3404,6 +3404,9 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
         n->host_features |= (1ULL << VIRTIO_NET_F_STANDBY);
     }
 
+    if (n->packed)
+        n->host_features |= (1ULL << VIRTIO_F_RING_PACKED);
+
     virtio_net_set_config_size(n, n->host_features);
     virtio_init(vdev, "virtio-net", VIRTIO_ID_NET, n->config_size);
 
@@ -3708,6 +3711,7 @@ static Property virtio_net_properties[] = {
     DEFINE_PROP_INT32("speed", VirtIONet, net_conf.speed, SPEED_UNKNOWN),
     DEFINE_PROP_STRING("duplex", VirtIONet, net_conf.duplex_str),
     DEFINE_PROP_BOOL("failover", VirtIONet, failover, false),
+    DEFINE_PROP_BOOL("ring-packed", VirtIONet, packed, false),
     DEFINE_PROP_END_OF_LIST(),
 };
 
