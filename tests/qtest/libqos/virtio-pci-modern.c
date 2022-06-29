@@ -43,18 +43,14 @@ static uint64_t get_features(QVirtioDevice *d)
     uint64_t lo, hi;
 
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg,
-                            device_feature_select),
-                   0);
+                   VIRTIO_PCI_COMMON_DFSELECT, 0);
     lo = qpci_io_readl(dev->pdev, dev->bar, dev->common_cfg_offset +
-                       offsetof(struct virtio_pci_common_cfg, device_feature));
+                       VIRTIO_PCI_COMMON_DF);
 
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg,
-                            device_feature_select),
-                   1);
+                   VIRTIO_PCI_COMMON_DF, 1);
     hi = qpci_io_readl(dev->pdev, dev->bar, dev->common_cfg_offset +
-                       offsetof(struct virtio_pci_common_cfg, device_feature));
+                       VIRTIO_PCI_COMMON_DF);
 
     return (hi << 32) | lo;
 }
@@ -67,21 +63,13 @@ static void set_features(QVirtioDevice *d, uint64_t features)
     g_assert_cmphex(features & (1ull << VIRTIO_F_VERSION_1), !=, 0);
 
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg,
-                            guest_feature_select),
-                   0);
+                   VIRTIO_PCI_COMMON_GFSELECT, 0);
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg,
-                            guest_feature),
-                   features);
+                   VIRTIO_PCI_COMMON_GF, features);
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg,
-                            guest_feature_select),
-                   1);
+                   VIRTIO_PCI_COMMON_GFSELECT, 1);
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg,
-                            guest_feature),
-                   features >> 32);
+                   VIRTIO_PCI_COMMON_GF, features >> 32);
 }
 
 static uint64_t get_guest_features(QVirtioDevice *d)
@@ -90,18 +78,14 @@ static uint64_t get_guest_features(QVirtioDevice *d)
     uint64_t lo, hi;
 
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg,
-                            guest_feature_select),
-                   0);
+                   VIRTIO_PCI_COMMON_GFSELECT, 0);
     lo = qpci_io_readl(dev->pdev, dev->bar, dev->common_cfg_offset +
-                       offsetof(struct virtio_pci_common_cfg, guest_feature));
+                       VIRTIO_PCI_COMMON_GF);
 
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg,
-                            guest_feature_select),
-                   1);
+                   VIRTIO_PCI_COMMON_GFSELECT, 1);
     hi = qpci_io_readl(dev->pdev, dev->bar, dev->common_cfg_offset +
-                       offsetof(struct virtio_pci_common_cfg, guest_feature));
+                       VIRTIO_PCI_COMMON_GF);
 
     return (hi << 32) | lo;
 }
@@ -111,8 +95,7 @@ static uint8_t get_status(QVirtioDevice *d)
     QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
 
     return qpci_io_readb(dev->pdev, dev->bar, dev->common_cfg_offset +
-                         offsetof(struct virtio_pci_common_cfg,
-                                  device_status));
+                         VIRTIO_PCI_COMMON_STATUS);
 }
 
 static void set_status(QVirtioDevice *d, uint8_t status)
@@ -120,9 +103,7 @@ static void set_status(QVirtioDevice *d, uint8_t status)
     QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
 
     return qpci_io_writeb(dev->pdev, dev->bar, dev->common_cfg_offset +
-                          offsetof(struct virtio_pci_common_cfg,
-                                   device_status),
-                          status);
+                          VIRTIO_PCI_COMMON_STATUS, status);
 }
 
 static bool get_msix_status(QVirtioPCIDevice *dev, uint32_t msix_entry,
@@ -187,8 +168,7 @@ static void queue_select(QVirtioDevice *d, uint16_t index)
     QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
 
     qpci_io_writew(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_select),
-                   index);
+                   VIRTIO_PCI_COMMON_Q_SELECT, index);
 }
 
 static uint16_t get_queue_size(QVirtioDevice *d)
@@ -196,7 +176,7 @@ static uint16_t get_queue_size(QVirtioDevice *d)
     QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
 
     return qpci_io_readw(dev->pdev, dev->bar, dev->common_cfg_offset +
-                         offsetof(struct virtio_pci_common_cfg, queue_size));
+                         VIRTIO_PCI_COMMON_Q_SIZE);
 }
 
 static void set_queue_address(QVirtioDevice *d, QVirtQueue *vq)
@@ -204,25 +184,19 @@ static void set_queue_address(QVirtioDevice *d, QVirtQueue *vq)
     QVirtioPCIDevice *dev = container_of(d, QVirtioPCIDevice, vdev);
 
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_desc_lo),
-                   vq->desc);
+                   VIRTIO_PCI_COMMON_Q_DESCLO, vq->desc);
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_desc_hi),
-                   vq->desc >> 32);
+                   VIRTIO_PCI_COMMON_Q_DESCHI, vq->desc >> 32);
 
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_driver_lo),
-                   vq->avail);
+                   VIRTIO_PCI_COMMON_Q_AVAILLO, vq->avail);
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_driver_hi),
-                   vq->avail >> 32);
+                   VIRTIO_PCI_COMMON_Q_AVAILHI, vq->avail >> 32);
 
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_device_lo),
-                   vq->used);
+                   VIRTIO_PCI_COMMON_Q_USEDLO, vq->used);
     qpci_io_writel(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_device_hi),
-                   vq->used >> 32);
+                   VIRTIO_PCI_COMMON_Q_USEDHI, vq->used >> 32);
 }
 
 static QVirtQueue *virtqueue_setup(QVirtioDevice *d, QGuestAllocator *alloc,
@@ -237,14 +211,13 @@ static QVirtQueue *virtqueue_setup(QVirtioDevice *d, QGuestAllocator *alloc,
     vqpci = container_of(vq, QVirtQueuePCI, vq);
 
     notify_off = qpci_io_readw(dev->pdev, dev->bar, dev->common_cfg_offset +
-                               offsetof(struct virtio_pci_common_cfg,
-                                        queue_notify_off));
+                               VIRTIO_PCI_COMMON_Q_NOFF);
 
     vqpci->notify_offset = dev->notify_cfg_offset +
                            notify_off * dev->notify_off_multiplier;
 
     qpci_io_writew(dev->pdev, dev->bar, dev->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_enable), 1);
+                   VIRTIO_PCI_COMMON_Q_ENABLE, 1);
 
     return vq;
 }
@@ -282,10 +255,9 @@ static void set_config_vector(QVirtioPCIDevice *d, uint16_t entry)
     uint16_t vector;
 
     qpci_io_writew(d->pdev, d->bar, d->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, msix_config), entry);
+                   VIRTIO_PCI_COMMON_MSIX, entry);
     vector = qpci_io_readw(d->pdev, d->bar, d->common_cfg_offset +
-                           offsetof(struct virtio_pci_common_cfg,
-                                    msix_config));
+                           VIRTIO_PCI_COMMON_MSIX);
     g_assert_cmphex(vector, !=, VIRTIO_MSI_NO_VECTOR);
 }
 
@@ -296,11 +268,9 @@ static void set_queue_vector(QVirtioPCIDevice *d, uint16_t vq_idx,
 
     queue_select(&d->vdev, vq_idx);
     qpci_io_writew(d->pdev, d->bar, d->common_cfg_offset +
-                   offsetof(struct virtio_pci_common_cfg, queue_msix_vector),
-                   entry);
+                   VIRTIO_PCI_COMMON_Q_MSIX, entry);
     vector = qpci_io_readw(d->pdev, d->bar, d->common_cfg_offset +
-                           offsetof(struct virtio_pci_common_cfg,
-                                    queue_msix_vector));
+                           VIRTIO_PCI_COMMON_Q_MSIX);
     g_assert_cmphex(vector, !=, VIRTIO_MSI_NO_VECTOR);
 }
 
