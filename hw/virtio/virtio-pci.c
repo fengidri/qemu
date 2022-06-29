@@ -1360,9 +1360,13 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
         break;
     case VIRTIO_PCI_COMMON_Q_RESET:
         if (val == 1) {
-            proxy->vqs[vdev->queue_sel].enabled = 0;
-            virtio_queue_reset(vdev, vdev->queue_sel);
             proxy->vqs[vdev->queue_sel].reset = 1;
+
+            virtio_queue_reset(vdev, vdev->queue_sel);
+
+            /* mark reset complete */
+            proxy->vqs[vdev->queue_sel].reset = 0;
+            proxy->vqs[vdev->queue_sel].enabled = 0;
         }
         break;
     default:
