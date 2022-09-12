@@ -550,7 +550,8 @@ static void virtio_net_queue_reset(VirtIODevice *vdev, uint32_t queue_index)
     }
 
     if (get_vhost_net(nc->peer) &&
-        nc->peer->info->type == NET_CLIENT_DRIVER_TAP) {
+        (nc->peer->info->type == NET_CLIENT_DRIVER_TAP ||
+         nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_USER)) {
         vhost_net_virtqueue_reset(vdev, nc, queue_index);
     }
 
@@ -568,7 +569,8 @@ static void virtio_net_queue_enable(VirtIODevice *vdev, uint32_t queue_index)
     }
 
     if (get_vhost_net(nc->peer) &&
-        nc->peer->info->type == NET_CLIENT_DRIVER_TAP) {
+        (nc->peer->info->type == NET_CLIENT_DRIVER_TAP ||
+         nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_USER)) {
         r = vhost_net_virtqueue_restart(vdev, nc, queue_index);
         if (r < 0) {
             error_report("unable to restart vhost net virtqueue: %d, "
