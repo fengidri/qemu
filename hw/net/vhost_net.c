@@ -546,6 +546,9 @@ void vhost_net_virtqueue_reset(VirtIODevice *vdev, NetClientState *nc,
     assert(vhost_ops);
 
     idx = vhost_ops->vhost_get_vq_index(&net->dev, vq_index);
+    if (net->nc->info->type == NET_CLIENT_DRIVER_VHOST_USER) {
+        idx -= net->dev.vq_index;
+    }
 
     if (net->nc->info->type == NET_CLIENT_DRIVER_TAP) {
         file.index = idx;
