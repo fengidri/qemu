@@ -147,9 +147,9 @@ cryptodev_vhost_set_vq_index(CryptoDevBackendVhost *crypto,
 }
 
 static int
-vhost_set_vring_enable(CryptoDevBackendClient *cc,
-                            CryptoDevBackend *b,
-                            uint16_t queue, int enable)
+vhost_set_dev_enable(CryptoDevBackendClient *cc,
+                     CryptoDevBackend *b,
+                     uint16_t queue, int enable)
 {
     CryptoDevBackendVhost *crypto =
                        cryptodev_get_vhost(cc, b, queue);
@@ -162,8 +162,8 @@ vhost_set_vring_enable(CryptoDevBackendClient *cc,
     }
 
     vhost_ops = crypto->dev.vhost_ops;
-    if (vhost_ops->vhost_set_vring_enable) {
-        return vhost_ops->vhost_set_vring_enable(&crypto->dev, enable);
+    if (vhost_ops->vhost_set_dev_enable) {
+        return vhost_ops->vhost_set_dev_enable(&crypto->dev, enable);
     }
 
     return 0;
@@ -219,7 +219,7 @@ int cryptodev_vhost_start(VirtIODevice *dev, int total_queues)
 
         if (cc->vring_enable) {
             /* restore vring enable state */
-            r = vhost_set_vring_enable(cc, b, i, cc->vring_enable);
+            r = vhost_set_dev_enable(cc, b, i, cc->vring_enable);
 
             if (r < 0) {
                 goto err_start;

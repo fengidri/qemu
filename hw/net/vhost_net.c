@@ -397,7 +397,7 @@ int vhost_net_start(VirtIODevice *dev, NetClientState *ncs,
 
         if (peer->vring_enable) {
             /* restore vring enable state */
-            r = vhost_set_vring_enable(peer, peer->vring_enable);
+            r = vhost_set_dev_enable(peer, peer->vring_enable);
 
             if (r < 0) {
                 vhost_net_stop_one(get_vhost_net(peer), dev);
@@ -509,15 +509,15 @@ VHostNetState *get_vhost_net(NetClientState *nc)
     return vhost_net;
 }
 
-int vhost_set_vring_enable(NetClientState *nc, int enable)
+int vhost_set_dev_enable(NetClientState *nc, int enable)
 {
     VHostNetState *net = get_vhost_net(nc);
     const VhostOps *vhost_ops = net->dev.vhost_ops;
 
     nc->vring_enable = enable;
 
-    if (vhost_ops && vhost_ops->vhost_set_vring_enable) {
-        return vhost_ops->vhost_set_vring_enable(&net->dev, enable);
+    if (vhost_ops && vhost_ops->vhost_set_dev_enable) {
+        return vhost_ops->vhost_set_dev_enable(&net->dev, enable);
     }
 
     return 0;

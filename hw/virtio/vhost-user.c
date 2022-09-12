@@ -1198,7 +1198,7 @@ static int vhost_user_set_vring_base(struct vhost_dev *dev,
     return vhost_set_vring(dev, VHOST_USER_SET_VRING_BASE, ring);
 }
 
-static int vhost_user_set_vring_enable(struct vhost_dev *dev, int enable)
+static int vhost_user_set_dev_enable(struct vhost_dev *dev, int enable)
 {
     int i;
 
@@ -2627,7 +2627,7 @@ const VhostOps user_ops = {
         .vhost_set_owner = vhost_user_set_owner,
         .vhost_reset_device = vhost_user_reset_device,
         .vhost_get_vq_index = vhost_user_get_vq_index,
-        .vhost_set_vring_enable = vhost_user_set_vring_enable,
+        .vhost_set_dev_enable = vhost_user_set_dev_enable,
         .vhost_requires_shm_log = vhost_user_requires_shm_log,
         .vhost_migration_done = vhost_user_migration_done,
         .vhost_backend_can_merge = vhost_user_can_merge,
