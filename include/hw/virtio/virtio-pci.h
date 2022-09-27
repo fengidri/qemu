@@ -19,6 +19,7 @@
 #include "hw/virtio/virtio-bus.h"
 #include "qom/object.h"
 
+#include "standard-headers/linux/virtio_pci.h"
 
 /* virtio-pci-bus */
 
@@ -127,6 +128,15 @@ typedef struct VirtIOPCIQueue {
   uint32_t used[2];
 } VirtIOPCIQueue;
 
+struct VirtIOPCICustomMem {
+    VirtIOPCIRegion mem;
+
+    union {
+        struct virtio_pci_cap cap;
+        struct virtio_pci_cap64 cap64;
+    };
+};
+
 struct VirtIOPCIProxy {
     PCIDevice pci_dev;
     MemoryRegion bar;
@@ -146,6 +156,7 @@ struct VirtIOPCIProxy {
     uint32_t msix_bar_idx;
     uint32_t modern_io_bar_idx;
     uint32_t modern_mem_bar_idx;
+    uint32_t modern_custom_bar_idx;
     int config_cap;
     uint32_t flags;
     bool disable_modern;
@@ -161,6 +172,10 @@ struct VirtIOPCIProxy {
     VirtIOIRQFD *vector_irqfd;
     int nvqs_with_notifiers;
     VirtioBusState bus;
+
+    MemoryRegion modern_custom_bar;
+    struct VirtIOPCICustomMem *custom_mem;
+    int custom_mem_n;
 };
 
 static inline bool virtio_pci_modern(VirtIOPCIProxy *proxy)

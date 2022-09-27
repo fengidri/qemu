@@ -1602,6 +1602,14 @@ static void virtio_pci_modern_mem_region_map(VirtIOPCIProxy *proxy,
                                  &proxy->modern_bar, proxy->modern_mem_bar_idx);
 }
 
+static void virtio_pci_modern_custom_region_map(VirtIOPCIProxy *proxy,
+                                                 VirtIOPCIRegion *region,
+                                                 struct virtio_pci_cap *cap)
+{
+    virtio_pci_modern_region_map(proxy, region, cap,
+                                 &proxy->modern_custom_bar, proxy->modern_custom_bar_idx);
+}
+
 static void virtio_pci_modern_io_region_map(VirtIOPCIProxy *proxy,
                                             VirtIOPCIRegion *region,
                                             struct virtio_pci_cap *cap)
@@ -1736,6 +1744,36 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
         virtio_pci_modern_mem_region_map(proxy, &proxy->device, &cap);
         virtio_pci_modern_mem_region_map(proxy, &proxy->notify, &notify.cap);
 
+        if (proxy->custom_mem_n) {
+            uint64_t size;
+            int i;
+
+            size = 0;
+
+            for (i = 0; i < proxy->custom_mem_n; ++i) {
+                proxy->custom_mem[i].mem.offset = size;
+                size += proxy->custom_mem[i].mem.size;
+            }
+
+            memory_region_init(&proxy->modern_custom_bar, OBJECT(proxy),
+                               "virtio-pci-custom",
+                               /* PCI BAR regions must be powers of 2 */
+                               pow2ceil(size));
+
+            for (i = 0; i < proxy->custom_mem_n; ++i) {
+                virtio_pci_modern_custom_region_map(proxy,
+                                                    &proxy->custom_mem[i].mem,
+                                                    &proxy->custom_mem[i].cap);
+            }
+
+            pci_register_bar(&proxy->pci_dev,
+                             proxy->modern_custom_bar_idx,
+                             PCI_BASE_ADDRESS_SPACE_MEMORY |
+                             PCI_BASE_ADDRESS_MEM_PREFETCH |
+                             PCI_BASE_ADDRESS_MEM_TYPE_64,
+                             &proxy->modern_custom_bar);
+        }
+
         if (modern_pio) {
             memory_region_init(&proxy->io_bar, OBJECT(proxy),
                                "virtio-pci-io", 0x4);
@@ -1833,11 +1871,13 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
      *   region 1   --  msi-x bar
      *   region 2   --  virtio modern io bar (off by default)
      *   region 3   --  virtio modern memory (32bit) bar
+     *   region 4+5 --  virtio custom memory (64bit) bar
      */
     proxy->legacy_io_bar_idx  = 0;
     proxy->msix_bar_idx       = 1;
     proxy->modern_io_bar_idx  = 2;
     proxy->modern_mem_bar_idx = 3;
+    proxy->modern_custom_bar_idx = 4;
 
     proxy->common.offset = 0x0;
     proxy->common.size = 0x1000;
