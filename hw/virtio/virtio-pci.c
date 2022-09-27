@@ -852,7 +852,7 @@ static void virtio_pci_vq_vector_mask(VirtIOPCIProxy *proxy,
 
     /* If guest supports masking, keep irqfd but mask it.
      * Otherwise, clean it up now.
-     */ 
+     */
     if (vdev->use_guest_notifier_mask && k->guest_notifier_mask) {
         k->guest_notifier_mask(vdev, queue_no, true);
     } else {
@@ -1749,8 +1749,7 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
 
         pci_register_bar(&proxy->pci_dev, proxy->modern_mem_bar_idx,
                          PCI_BASE_ADDRESS_SPACE_MEMORY |
-                         PCI_BASE_ADDRESS_MEM_PREFETCH |
-                         PCI_BASE_ADDRESS_MEM_TYPE_64,
+                         PCI_BASE_ADDRESS_MEM_PREFETCH,
                          &proxy->modern_bar);
 
         proxy->config_cap = virtio_pci_add_mem_cap(proxy, &cfg.cap);
@@ -1833,13 +1832,12 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
      *   region 0   --  virtio legacy io bar
      *   region 1   --  msi-x bar
      *   region 2   --  virtio modern io bar (off by default)
-     *   region 4+5 --  virtio modern memory (64bit) bar
-     *
+     *   region 3   --  virtio modern memory (32bit) bar
      */
     proxy->legacy_io_bar_idx  = 0;
     proxy->msix_bar_idx       = 1;
     proxy->modern_io_bar_idx  = 2;
-    proxy->modern_mem_bar_idx = 4;
+    proxy->modern_mem_bar_idx = 3;
 
     proxy->common.offset = 0x0;
     proxy->common.size = 0x1000;
