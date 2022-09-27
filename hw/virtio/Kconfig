@@ -80,3 +80,9 @@ config VHOST_USER_FS
     bool
     default y
     depends on VIRTIO && VHOST_USER
+
+config VIRTIO_ISHM
+    bool
+    default y
+    depends on VIRTIO
+
