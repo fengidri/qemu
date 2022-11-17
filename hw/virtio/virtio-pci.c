@@ -1584,12 +1584,30 @@ static void virtio_pci_modern_region_map(VirtIOPCIProxy *proxy,
                                          MemoryRegion *mr,
                                          uint8_t bar)
 {
+    uint32_t off, off_hi, size, size_hi;
+
     memory_region_add_subregion(mr, region->offset, &region->mr);
+
+    off_hi = region->offset >> 32;
+    size_hi = region->size >> 32;
+
+    off = (region->offset << 32) >> 32;
+    size = (region->size << 32) >> 32;
 
     cap->cfg_type = region->type;
     cap->bar = bar;
-    cap->offset = cpu_to_le32(region->offset);
-    cap->length = cpu_to_le32(region->size);
+    cap->offset = cpu_to_le32(off);
+    cap->length = cpu_to_le32(size);
+
+    if (cap->cap_len == sizeof(struct virtio_pci_cap64)) {
+        struct virtio_pci_cap64 *cap64;
+
+        cap64 = (struct virtio_pci_cap64 *)cap;
+
+        cap64->offset_hi = cpu_to_le32(off_hi);
+        cap64->length_hi = cpu_to_le32(size_hi);
+    }
+
     virtio_pci_add_mem_cap(proxy, cap);
 
 }

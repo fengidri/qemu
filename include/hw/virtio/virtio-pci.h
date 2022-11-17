@@ -110,8 +110,8 @@ struct VirtioPCIClass {
 
 typedef struct VirtIOPCIRegion {
     MemoryRegion mr;
-    uint32_t offset;
-    uint32_t size;
+    uint64_t offset;
+    uint64_t size;
     uint32_t type;
 } VirtIOPCIRegion;
 
